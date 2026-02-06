@@ -1,1 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akaza Bot - Discord Anti Raid Protection</title>
+      <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #11111f;
+            --bg-card: #1a1a2e;
+            --bg-accent: #22223a;
+            --text-primary: #ffffff;
+            --text-secondary: #b0b0d0;
+            --accent-primary: #4a6fff;
+            --accent-secondary: #ff4a6f;
+            --accent-success: #2ecc71;
+            --accent-warning: #f39c12;
+            --accent-danger: #e74c3c;
+            --gradient-primary: linear-gradient(135deg, #4a6fff 0%, #9d4aff 100%);
+            --gradient-dark: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 100%);
+            --gradient-card: linear-gradient(145deg, #1a1a2e 0%, #22223a 100%);
+            --shadow-light: 0 8px 32px rgba(74, 111, 255, 0.1);
+            --shadow-medium: 0 10px 40px rgba(0, 0, 0, 0.3);
+            --shadow-heavy: 0 15px 50px rgba(0, 0, 0, 0.5);
+            --border-radius: 12px;
+            --border-radius-lg: 20px;
+            --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header & Navigation */
+        header {
+            background-color: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .logo-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            object-fit: contain;
+            background: black;
+            padding: 5px;
+            box-shadow: black;
+        }
+
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: white;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+            padding: 5px 0;
+        }
+
+        .nav-links a:hover {
+            color: var(--text-primary);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient-primary);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.8rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-primary {
+            background: var(--gradient-primary);
+            color: white;
+            box-shadow: var(--shadow-light);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(74, 111, 255, 0.3);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            transform: translateY(-3px);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Mobile Menu */
+        .mobile-menu {
+            position: fixed;
+            top: 80px;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            padding: 2rem;
+            display: none;
+            flex-direction: column;
+            gap: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: var(--shadow-heavy);
+            z-index: 999;
+        }
+
+        .mobile-menu.active {
+            display: flex;
+        }
+
+        .mobile-menu a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 1.1rem;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            transition: var(--transition);
+        }
+
+        .mobile-menu a:hover {
+            color: var(--accent-primary);
+            padding-left: 10px;
+        }
+
+        .mobile-menu .btn {
+            width: 100%;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 12rem 0 8rem;
+            background: var(--gradient-dark);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(74, 111, 255, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(157, 74, 255, 0.05) 0%, transparent 50%);
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background: rgba(74, 111, 255, 0.1);
+            color: var(--accent-primary);
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(74, 111, 255, 0.2);
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+            background: linear-gradient(to right, var(--text-primary), var(--accent-primary));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            max-width: 700px;
+            margin: 0 auto 3rem;
+        }
+
+        .cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 3rem;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 5rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Features Section */
+        .section {
+            padding: 6rem 0;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 5rem;
+        }
+
+        .section-subtitle {
+            color: var(--accent-primary);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.9rem;
+        }
+
+        .section-title {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+        }
+
+        .section-description {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: var(--gradient-card);
+            border-radius: var(--border-radius-lg);
+            padding: 2.5rem;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient-primary);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-heavy);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-icon {
+            width: 70px;
+            height: 70px;
+            background: rgba(74, 111, 255, 0.1);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            color: var(--accent-primary);
+            border: 1px solid rgba(74, 111, 255, 0.2);
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card p {
+            color: var(--text-secondary);
+        }
+
+        /* Commands Section */
+        .commands {
+            background-color: var(--bg-secondary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .commands::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 30% 70%, rgba(74, 111, 255, 0.05) 0%, transparent 50%);
+        }
+
+        .commands-container {
+            position: relative;
+            z-index: 1;
+        }
+
+        .command-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .command-card {
+            background: var(--gradient-card);
+            border-radius: var(--border-radius-lg);
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: var(--transition);
+        }
+
+        .command-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-medium);
+            border-color: rgba(74, 111, 255, 0.2);
+        }
+
+        .command-card.premium {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(157, 74, 255, 0.2);
+        }
+
+        .premium-badge {
+            position: absolute;
+            top: 15px;
+            right: -30px;
+            background: linear-gradient(45deg, #ff4a6f, #9d4aff);
+            color: white;
+            padding: 5px 35px;
+            transform: rotate(45deg);
+            font-size: 0.8rem;
+            font-weight: 700;
+            box-shadow: 0 5px 15px rgba(157, 74, 255, 0.3);
+        }
+
+        .command-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 1.5rem;
+        }
+
+        .command-icon {
+            width: 50px;
+            height: 50px;
+            background: rgba(74, 111, 255, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: var(--accent-primary);
+        }
+
+        .command-card.premium .command-icon {
+            background: rgba(157, 74, 255, 0.1);
+            color: #9d4aff;
+        }
+
+        .command-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .command-description {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* Premium Section */
+        .premium-section {
+            position: relative;
+            padding: 8rem 0;
+            overflow: hidden;
+        }
+
+        .premium-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 70% 30%, rgba(157, 74, 255, 0.1) 0%, transparent 50%);
+        }
+
+        .premium-card {
+            background: var(--gradient-card);
+            border-radius: var(--border-radius-lg);
+            padding: 4rem;
+            max-width: 900px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(157, 74, 255, 0.2);
+            box-shadow: var(--shadow-heavy);
+            text-align: center;
+        }
+
+        .premium-badge-large {
+            display: inline-block;
+            background: linear-gradient(45deg, #ff4a6f, #9d4aff);
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 50px;
+            font-weight: 700;
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+            box-shadow: 0 10px 20px rgba(157, 74, 255, 0.3);
+        }
+
+        .premium-card h3 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, #ff4a6f, #9d4aff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .premium-features {
+            list-style: none;
+            margin: 3rem 0;
+            text-align: left;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .premium-features li {
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: var(--border-radius);
+            border-left: 4px solid var(--accent-primary);
+        }
+
+        .premium-features i {
+            color: var(--accent-success);
+            font-size: 1.2rem;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--bg-secondary);
+            padding: 5rem 0 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-logo-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            object-fit: contain;
+            background: black;
+            padding: 5px;
+        }
+
+        .footer-logo-text {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: white;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .footer-logo p {
+            color: var(--text-secondary);
+            max-width: 300px;
+        }
+
+        .footer-links h4 {
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            font-size: 1.2rem;
+            position: relative;
+            padding-bottom: 10px;
+        }
+
+        .footer-links h4::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--gradient-primary);
+        }
+
+        .footer-links ul {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.8rem;
+        }
+
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent-primary);
+            transform: translateX(5px);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-card);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .social-link:hover {
+            background: var(--gradient-primary);
+            color: white;
+            transform: translateY(-5px);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+
+        .step-number {
+            display: inline-block;
+            background: var(--gradient-primary);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .hero h1 {
+                font-size: 2.8rem;
+            }
+            
+            .section-title {
+                font-size: 2.3rem;
+            }
+            
+            .premium-card {
+                padding: 3rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links, .nav-actions {
+                display: none;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .hero {
+                padding: 10rem 0 6rem;
+            }
+            
+            .hero h1 {
+                font-size: 2.2rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+            
+            .stats {
+                gap: 2rem;
+            }
+            
+            .feature-card, .command-card {
+                padding: 2rem;
+            }
+            
+            .premium-card {
+                padding: 2rem;
+            }
+            
+            .cloudflare-section {
+                padding: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 1.8rem;
+            }
+            
+            .section-title {
+                font-size: 1.8rem;
+            }
+            
+            .stat-number {
+                font-size: 2rem;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-logo {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        /* Animation Classes */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav>
+                <a href="#" class="logo">
+                    <!-- আপনার logo.png ব্যবহার করুন -->
+                    <img src="logo.png" alt="Akaza Bot Logo" class="logo-img" id="logo-image">
+                    <div class="logo-text">Akaza</div>
+                </a>
+                
+                <div class="nav-links">
+                    <a href="#features">Features</a>
+                    <a href="#commands">Commands</a>
+                    <a href="#premium">Premium</a>
+                    <a href="#deploy">Deploy</a>
+                    <a href="#support">Support</a>
+                </div>
+                
+                <div class="nav-actions">
+                    <a href="#" class="btn btn-secondary">Dashboard</a>
+                    <a href="#" class="btn btn-primary">Invite Bot</a>
+                </div>
+                
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </nav>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div class="mobile-menu" id="mobileMenu">
+            <a href="#features">Features</a>
+            <a href="#commands">Commands</a>
+            <a href="#premium">Premium</a>
+           <a href="#support">Support</a>
+            
+            <a href="#" class="btn btn-primary">Invite Bot</a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content fade-in">
+                <span class="hero-badge">v2.0.1 • 1k+ Servers</span>
+                <h1>Advanced Discord Moderation & Protection</h1>
+                <p>Akaza is an all-in-one Discord moderation bot that protects your server from raids, nukes, and spam. Verify users, kick bot accounts, limit moderation commands, and manage your community efficiently.</p>
+                
+                <div class="cta-buttons">
+                    <a href="#" class="btn btn-primary">
+                        <i class="fas fa-bolt"></i> Invite Akaza
+                    </a>
+                    <a href="#features" class="btn btn-secondary">
+                        <i class="fas fa-play-circle"></i> See Features
+                    </a>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-number">1K+</div>
+                        <div class="stat-label">Servers Protected</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">3K+</div>
+                        <div class="stat-label">Users Verified</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">99.9%</div>
+                        <div class="stat-label">Uptime</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="section">
+        <div class="container">
+            <div class="section-header fade-in">
+                <span class="section-subtitle">Powerful Features</span>
+                <h2 class="section-title">Complete Server Protection</h2>
+                <p class="section-description">Akaza provides everything you need to keep your Discord server safe, organized, and under control.</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Advanced Anti-Raid</h3>
+                    <p>Intelligent detection system that identifies and prevents malicious raid activities before they can harm your community.</p>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <h3>Bot Account Detection</h3>
+                    <p>Automatically detect and remove suspicious bot accounts that join your server with malicious intent.</p>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <h3>User Verification</h3>
+                    <p>Implement custom verification systems to ensure only legitimate users can access your server features.</p>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-sliders-h"></i>
+                    </div>
+                    <h3>Command Management</h3>
+                    <p>Granular control over who can use moderation commands with role-based permission systems.</p>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <h3>Activity Logging</h3>
+                    <p>Comprehensive logs of all moderation actions, user joins/leaves, and suspicious activities.</p>
+                </div>
+                
+                <div class="feature-card fade-in">
+                    <div class="feature-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <h3>Real-time Alerts</h3>
+                    <p>Get instant notifications about suspicious activities, raids, or security breaches in your server.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Commands Section -->
+    <section id="commands" class="section commands">
+        <div class="container commands-container">
+            <div class="section-header fade-in">
+                <span class="section-subtitle">Command Interface</span>
+                <h2 class="section-title">Essential Moderation Commands</h2>
+                <p class="section-description">Akaza's slash commands provide intuitive and powerful moderation tools for your server.</p>
+            </div>
+            
+            <div class="command-grid">
+                <div class="command-card fade-in">
+                    <div class="command-header">
+                        <div class="command-icon">
+                            <i class="fas fa-hammer"></i>
+                        </div>
+                        <div>
+                            <div class="command-name">/ban</div>
+                            <div class="command-description">Permanently remove users</div>
+                        </div>
+                    </div>
+                    <p>Ban users from your server with customizable reasons, duration options, and automatic logging of all actions.</p>
+                </div>
+                
+                <div class="command-card fade-in">
+                    <div class="command-header">
+                        <div class="command-icon">
+                            <i class="fas fa-walking"></i>
+                        </div>
+                        <div>
+                            <div class="command-name">/kick</div>
+                            <div class="command-description">Remove users temporarily</div>
+                        </div>
+                    </div>
+                    <p>Remove users from your server without banning them. Perfect for warnings or temporary rule violations.</p>
+                </div>
+                
+                <div class="command-card fade-in">
+                    <div class="command-header">
+                        <div class="command-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <div>
+                            <div class="command-name">/anti raid</div>
+                            <div class="command-description">Configure protection</div>
+                        </div>
+                    </div>
+                    <p>Configure anti-raid settings including sensitivity levels, detection parameters, and automatic responses.</p>
+                </div>
+                
+                <div class="command-card premium fade-in">
+                    <div class="premium-badge">PREMIUM</div>
+                    <div class="command-header">
+                        <div class="command-icon">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div>
+                            <div class="command-name">/premium anti raid</div>
+                            <div class="command-description">Advanced protection</div>
+                        </div>
+                    </div>
+                    <p>Access advanced anti-raid features with real-time analytics, custom detection patterns, and priority support.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+
+    <!-- Premium Section -->
+    <section id="premium" class="premium-section">
+        <div class="container">
+            <div class="premium-card fade-in">
+                <span class="premium-badge-large">Premium Features</span>
+                <h3>Upgrade to Akaza Premium</h3>
+                <p>Unlock the full potential of Akaza with advanced features and priority support</p>
+                
+                <ul class="premium-features">
+                    <li><i class="fas fa-check-circle"></i> Advanced anti-raid with real-time analytics</li>
+                    <li><i class="fas fa-check-circle"></i> Custom raid pattern detection algorithms</li>
+                    <li><i class="fas fa-check-circle"></i> Priority support and faster updates</li>
+                    <li><i class="fas fa-check-circle"></i> Advanced command permissions system</li>
+                    <li><i class="fas fa-check-circle"></i> Detailed moderation logs with analytics</li>
+                    <li><i class="fas fa-check-circle"></i> Customizable automation rules</li>
+                </ul>
+                
+                <a href="#" class="btn btn-primary" style="padding: 1rem 3rem; font-size: 1.1rem;">
+                    <i class="fas fa-crown"></i> Get Premium - $4.99/month
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer id="support">
+        <div class="container">
+            <div class="footer-content">
+                <div>
+                    <div class="footer-logo">
+                        <img src="logo.png" alt="Akaza Bot Logo" class="footer-logo-img">
+                        <div class="footer-logo-text">Akaza</div>
+                    </div>
+                    <p>Ultimate Discord moderation and protection for your community. Keep your server safe from raids, spam, and malicious activities.</p>
+                    
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="fab fa-discord"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+                        <a href="#" class="social-link"><i class="fas fa-envelope"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-links">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="#features"><i class="fas fa-chevron-right"></i> Features</a></li>
+                        <li><a href="#commands"><i class="fas fa-chevron-right"></i> Commands</a></li>
+                        <li><a href="#premium"><i class="fas fa-chevron-right"></i> Premium</a></li>
+
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2026 Akaza Bot. All rights reserved. </p>
+                <p style="margin-top: 0.5rem; font-size: 0.8rem; color: rgba(255, 255, 255, 0.3);">Not affiliated with Discord Inc.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            mobileMenu.classList.toggle('active');
+            
+            // Toggle icon
+            const icon = this.querySelector('i');
+            if (mobileMenu.classList.contains('active')) {
+                icon.className = 'fas fa-times';
+            } else {
+                icon.className = 'fas fa-bars';
+            }
+        });
+
+        // Close mobile menu when clicking a link
+        document.querySelectorAll('.mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                document.getElementById('mobileMenu').classList.remove('active');
+                document.querySelector('#mobileMenuBtn i').className = 'fas fa-bars';
+            });
+        });
+
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 80,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+        // Logo fallback if image doesn't load
+        document.getElementById('logo-image').addEventListener('error', function() {
+            this.style.display = 'none';
+            // Create a fallback logo icon
+            const logoContainer = this.parentElement;
+            const fallbackIcon = document.createElement('div');
+            fallbackIcon.className = 'logo-img';
+            fallbackIcon.style.display = 'flex';
+            fallbackIcon.style.alignItems = 'center';
+            fallbackIcon.style.justifyContent = 'center';
+            fallbackIcon.innerHTML = '<i class="fas fa-shield-alt" style="font-size: 1.5rem;"></i>';
+            logoContainer.insertBefore(fallbackIcon, this.nextSibling);
+        });
+
+        // Add hover effect to feature cards
+        document.querySelectorAll('.feature-card, .command-card, .cloudflare-step').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = this.classList.contains('feature-card') 
+                    ? 'translateY(-10px) scale(1.02)' 
+                    : 'translateY(-5px) scale(1.02)';
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>
